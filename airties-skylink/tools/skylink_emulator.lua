@@ -145,7 +145,7 @@ local runtime = {
 
 local scanned_networks = {
   {
-    ssid = "Mercku_Guest", channel = "11", mode = "",
+    ssid = "Lab_Guest", channel = "11", mode = "",
     security = "open", encryption = "none", strength = "100"
   },
   {

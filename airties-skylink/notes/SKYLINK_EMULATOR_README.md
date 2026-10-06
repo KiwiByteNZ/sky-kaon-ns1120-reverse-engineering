@@ -1,12 +1,13 @@
-# Mercku SkyLink emulator
+# SkyLink emulator
 
-This kit makes the Mercku temporarily emulate the AirTies SkyLink management
+This kit makes a compatible lab router temporarily emulate the AirTies SkyLink
+management
 interface used by the directly connected Sky box.
 
 ## Topology
 
 ```text
-Sky box SkyLink Ethernet port -> Mercku LAN port
+Sky box SkyLink Ethernet port -> lab-router LAN port
 ```
 
 Do not connect the physical AirTies SkyLink while its MAC address is being
@@ -21,10 +22,10 @@ chmod +x setup_skylink_emulator.sh status_skylink_emulator.sh stop_skylink_emula
 ./setup_skylink_emulator.sh
 ```
 
-Enter the Mercku root password when SCP and SSH request it. The known lab
+Enter the lab router's root password when SCP and SSH request it. The known lab
 password is not embedded in these files.
 
-The script installs only temporary state. Run it again after either the Mercku
+The script installs only temporary state. Run it again after either the router
 or its `/tmp` filesystem has been reset.
 
 ## Check status
@@ -40,13 +41,13 @@ ssh -o HostKeyAlgorithms=+ssh-rsa root@192.168.50.1
 tcpdump -i br-lan -nn -s0 -A 'host 90.223.243.226 and tcp port 80'
 ```
 
-## Stop and restore the Mercku identity
+## Stop and restore the router identity
 
 ```bash
 ./stop_skylink_emulator.sh
 ```
 
-A Mercku reboot also removes the running emulator, temporary address and
+A router reboot also removes the running emulator, temporary address and
 firewall rules. The setup script changes `br-lan` to the AirTies MAC, so use the
 stop script when you want to restore the original MAC without rebooting.
 
@@ -70,5 +71,5 @@ ROUTER_IP=192.168.50.1 SKYLINK_MAC=88:41:fc:6f:dc:52 ./setup_skylink_emulator.sh
 ```
 
 The emulator keeps an in-memory setup state. `survey`, `networks`, `join`,
-`settings.type`, and `set` are simulated without changing the Mercku radio or
+`settings.type`, and `set` are simulated without changing the router radio or
 network configuration. `reset`, `reboot`, and `upgrade` remain blocked.

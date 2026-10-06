@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-EMULATOR_FILE="$SCRIPT_DIR/mercku_skylink_emulator.lua"
+EMULATOR_FILE="$SCRIPT_DIR/skylink_emulator.lua"
 
 ROUTER_IP=${ROUTER_IP:-192.168.50.1}
 ROUTER_USER=${ROUTER_USER:-root}
@@ -25,7 +25,7 @@ fi
 
 echo "Uploading emulator to $ROUTER_USER@$ROUTER_IP ..."
 scp -O "${SSH_OPTIONS[@]}" "$EMULATOR_FILE" \
-  "$ROUTER_USER@$ROUTER_IP:/tmp/mercku_skylink_emulator.lua"
+  "$ROUTER_USER@$ROUTER_IP:/tmp/skylink_emulator.lua"
 
 echo "Configuring the temporary SkyLink identity and firewall rules ..."
 ssh "${SSH_OPTIONS[@]}" "$ROUTER_USER@$ROUTER_IP" sh -s -- \
@@ -39,7 +39,7 @@ skylink_ip=$3
 skylink_prefix=$4
 skylink_mac=$5
 remote_port=$6
-emulator=/tmp/mercku_skylink_emulator.lua
+emulator=/tmp/skylink_emulator.lua
 pid_file=/tmp/skylink-emulator.pid
 log_file=/tmp/skylink-emulator.log
 
@@ -54,7 +54,7 @@ fi
 # Remove any older instance left by a partially completed setup.
 for old_pid in $(pidof lua 2>/dev/null || true); do
   if tr '\000' ' ' <"/proc/$old_pid/cmdline" 2>/dev/null | \
-    grep -q '^lua /tmp/mercku_skylink_emulator[.]lua'; then
+    grep -q '^lua /tmp/skylink_emulator[.]lua'; then
     kill "$old_pid" 2>/dev/null || true
   fi
 done
@@ -109,6 +109,6 @@ REMOTE_SCRIPT
 
 echo
 echo "SkyLink emulator is ready."
-echo "Connect: Sky box SkyLink port -> Mercku LAN port"
+echo "Connect: Sky box SkyLink port -> lab-router LAN port"
 echo "Capture on the router with:"
 echo "  tcpdump -i $ROUTER_INTERFACE -nn -s0 -A 'host $SKYBOX_IP and tcp port 80'"

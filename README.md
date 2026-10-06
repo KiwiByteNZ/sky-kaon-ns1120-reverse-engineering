@@ -9,7 +9,7 @@ and the AirTies Air4400SNZ Sky Wireless Connector.
   UPnP services.
 - `kaon/tools/upnp_xml_equivalence.py` — compares UPnP XML response behaviour.
 - `kaon/tools/upnp_xml_fuzz.py` — controlled UPnP XML parser testing.
-- `airties-skylink/tools/mercku_skylink_emulator.lua` — stateful emulator for
+- `airties-skylink/tools/skylink_emulator.lua` — stateful emulator for
   the SkyLink management protocol.
 - `airties-skylink/tools/setup_skylink_emulator.sh` — installs/configures the
   emulator on the lab router used during testing.

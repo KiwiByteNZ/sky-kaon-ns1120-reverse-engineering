@@ -4,21 +4,22 @@ Updated: 2026-09-20 (UTC)
 
 ## Scope and current state
 
-- Authorized closed-lab testing of a Sky box using a Mercku router as an AirTies/SkyLink emulator.
-- The emulator is currently running on the Mercku with the **normal** profile.
+- Authorized closed-lab testing of a Sky box using a lab router as an AirTies/SkyLink
+  emulator.
+- The emulator is currently running on the lab router with the **normal** profile.
 - Do not stop it unnecessarily. Mutating SkyLink operations (`join`, `set`, `reset`, `reboot`, and `upgrade`) remain disabled.
 - Router login credentials are deliberately not recorded in this file.
 
 ## Network map
 
-- Mercku normal management address: `192.168.50.1`
+- Lab-router management address: `192.168.50.1`
 - Sky box normal LAN address: `192.168.50.197`
 - Sky box SkyLink-management address: `90.223.243.226`
 - Emulated SkyLink address: `90.223.243.225/29`
 - Research workstation / callback listener: `192.168.0.163`
 - Sky box MAC: `94:3b:b1:c5:f4:96`
 - Real SkyLink MAC observed: `88:41:fc:6f:dc:52`
-- Mercku bridge was temporarily configured to present the SkyLink MAC and address.
+- The router bridge was temporarily configured to present the SkyLink MAC and address.
 
 Important ICMP interpretation:
 
@@ -27,18 +28,18 @@ Important ICMP interpretation:
 
 ## Emulator files
 
-- `mercku_skylink_emulator.lua` — HTTP emulator and test profiles.
-- `setup_skylink_emulator.sh` — installs/configures it on the Mercku.
+- `skylink_emulator.lua` — HTTP emulator and test profiles.
+- `setup_skylink_emulator.sh` — installs/configures it on the lab router.
 - `status_skylink_emulator.sh` — checks status.
 - `stop_skylink_emulator.sh` — stops and removes the temporary setup.
 - `SKYLINK_EMULATOR_README.md` — operating instructions.
 
 Router runtime paths:
 
-- `/tmp/mercku_skylink_emulator.lua`
+- `/tmp/skylink_emulator.lua`
 - `/tmp/skylink-emulator.pid`
 - `/tmp/skylink-emulator.log`
-- Lua listens on TCP `18080`; Mercku redirects `90.223.243.225:80` to it.
+- Lua listens on TCP `18080`; the router redirects `90.223.243.225:80` to it.
 
 Expected startup log:
 
@@ -104,7 +105,7 @@ Conclusion: no command execution was demonstrated through the `firmware` field i
 
 ## Packet capture
 
-Useful Mercku-side capture filter:
+Useful router-side capture filter:
 
 ```sh
 tcpdump -i br-lan -nn -s0 -A \
@@ -141,12 +142,13 @@ Implemented and deployed on 2026-09-21. The normal profile now safely simulates
 join expose timed `STA_SCANNING`/`STA_CONNECTING` transitions before returning
 to `STA_CONNECTED`; the network list contains `TestNetwork` and `LabGuest`.
 Submitted Wi-Fi keys are not stored and are redacted from logs. DHCP/static
-values alter only the emulator response state and never the Mercku network.
+values alter only the emulator response state and never the router network.
 `reset`, `reboot`, and `upgrade` remain blocked for later explicit testing.
 
 ## Authentic SkyLink workflow capture (2026-09-21)
 
-The two occupied Mercku LAN sockets had to be isolated from the ordinary LAN;
+The two occupied lab-router LAN sockets had to be isolated from the ordinary
+LAN;
 placing both devices on the original flat VLAN caused the Sky box to show only
 Automatic DHCP and produced unreliable same-switch-port forwarding. The working
 temporary topology is:
@@ -169,7 +171,7 @@ GET /stbadmin?capabilities HTTP/1.0
 GET /stbadmin?survey HTTP/1.0
 (poll GET /stbadmin?info while surveying="1")
 GET /stbadmin?networks&count="99" HTTP/1.0
-GET /stbadmin?join&ssid="Mercku_Guest"&security="open"&encryption="none"&key="" HTTP/1.0
+GET /stbadmin?join&ssid="Lab_Guest"&security="open"&encryption="none"&key="" HTTP/1.0
 (poll GET /stbadmin?info while joining="1")
 GET /stbadmin?capabilities HTTP/1.0
 ```
@@ -183,11 +185,11 @@ state="JOIN",   surveying="0", joining="1"
 state="AUTH",   surveying="0", joining="0"
 ```
 
-After association with the temporary open `Mercku_Guest` network, the real
+After association with the temporary open `Lab_Guest` network, the real
 SkyLink reported DHCP address `192.168.50.166` and gateway `192.168.50.1`.
 The guest profile was enabled in the running UCI state but was not committed.
 The temporary VLAN bridge remains active until explicitly restored or the
-Mercku is rebooted.
+router is rebooted.
 
 The emulator was subsequently updated and restarted on `br-skylink`. Its
 normal profile now reproduces the authentic initial values, capabilities,
@@ -196,7 +198,7 @@ transition. The physical SkyLink leg (`eth0.10`) was removed from `br-skylink`
 to prevent an address conflict; the Sky-box leg (`eth0.11`) remains attached.
 To return to the real SkyLink later, stop the emulator using
 `ROUTER_INTERFACE=br-skylink`, then run
-`brctl addif br-skylink eth0.10` on the Mercku.
+`brctl addif br-skylink eth0.10` on the lab router.
 
 ### Confirmed scan-list record injection
 
